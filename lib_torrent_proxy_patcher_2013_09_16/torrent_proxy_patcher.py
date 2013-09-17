@@ -115,7 +115,7 @@ def torrent_proxy_patcher(
                 if announce_item.startswith('http:'):
                     if not check_patched(announce_item, proxy_for_http) and \
                              not check_patched(announce_item, proxy_for_https):
-                        mew_announce_item = url_patcher(announce_item, proxy_for_http)
+                        new_announce_item = url_patcher(announce_item, proxy_for_http)
                         if on_url_patched is not None:
                             on_url_patched(announce_item, new_announce_item)
                         announce_item = new_announce_item
