@@ -100,6 +100,10 @@ def main():
                         assert isinstance(url, str)
                         assert isinstance(new_url, str)
                         
+                        if url == new_url:
+                            print('not changed: {!r}'.format(url))
+                            return
+                        
                         print('changed: {!r} to {!r}'.format(url, new_url))
                 else:
                     def on_url_patched(url, new_url):
