@@ -20,6 +20,8 @@ assert str is not bytes
 from urllib import parse as url_parse
 
 def normalize_proxy_url(proxy_url):
+    assert proxy_url is not None
+    
     proxy_scheme, proxy_netloc, proxy_path, proxy_query, proxy_fragment = url_parse.urlsplit(proxy_url)
     
     if not proxy_path.endswith('/'):
