@@ -18,11 +18,11 @@
 assert str is not bytes
 
 import unittest
-from . import torrent_proxy_patch
+from . import torrent_proxy_patcher
 
-class TestUrlPatch(unittest.TestCase):
-    def test_url_patch(self):
-        patched = torrent_proxy_patch.url_patch(
+class TestUrlPatcher(unittest.TestCase):
+    def test_url_patcher(self):
+        patched = torrent_proxy_patcher.url_patcher(
                 'http://bt3.rutracker.org/ann?uk=XXXXXXXX',
                 'https://ssl-proxy-for-https.example.com',
                 )
@@ -33,8 +33,8 @@ class TestUrlPatch(unittest.TestCase):
                 patched,
                 )
     
-    def test_url_patch_2(self):
-        patched = torrent_proxy_patch.url_patch(
+    def test_url_patcher_2(self):
+        patched = torrent_proxy_patcher.url_patcher(
                 'http://bt3.rutracker.org/ann?uk=XXXXXXXX',
                 'https://ssl-proxy-for-https.example.com/',
                 )
@@ -45,8 +45,8 @@ class TestUrlPatch(unittest.TestCase):
                 patched,
                 )
     
-    def test_url_patch_3(self):
-        patched = torrent_proxy_patch.url_patch(
+    def test_url_patcher_3(self):
+        patched = torrent_proxy_patcher.url_patcher(
                 'http://bt3.rutracker.org/ann?uk=XXXXXXXX',
                 'https://ssl-proxy-for-https.example.com/proxy',
                 )
@@ -57,8 +57,8 @@ class TestUrlPatch(unittest.TestCase):
                 patched,
                 )
     
-    def test_url_patch_4(self):
-        patched = torrent_proxy_patch.url_patch(
+    def test_url_patcher_4(self):
+        patched = torrent_proxy_patcher.url_patcher(
                 'http://bt3.rutracker.org/ann?uk=XXXXXXXX',
                 'https://ssl-proxy-for-https.example.com/proxy/',
                 )
@@ -69,8 +69,8 @@ class TestUrlPatch(unittest.TestCase):
                 patched,
                 )
     
-    def test_url_patch_5(self):
-        patched = torrent_proxy_patch.url_patch(
+    def test_url_patcher_5(self):
+        patched = torrent_proxy_patcher.url_patcher(
                 'http://bt3.rutracker.org/ann?uk=XXXXXXXX#fragment',
                 'https://ssl-proxy-for-https.example.com',
                 )
@@ -81,8 +81,8 @@ class TestUrlPatch(unittest.TestCase):
                 patched,
                 )
     
-    def test_url_patch_6(self):
-        patched = torrent_proxy_patch.url_patch(
+    def test_url_patcher_6(self):
+        patched = torrent_proxy_patcher.url_patcher(
                 'http://bt3.rutracker.org:8081/ann?uk=XXXXXXXX',
                 'https://ssl-proxy-for-https.example.com',
                 )
@@ -93,8 +93,8 @@ class TestUrlPatch(unittest.TestCase):
                 patched,
                 )
     
-    def test_url_patch_7(self):
-        patched = torrent_proxy_patch.url_patch(
+    def test_url_patcher_7(self):
+        patched = torrent_proxy_patcher.url_patcher(
                 'http://bt3.rutracker.org/ann?uk=XXXXXXXX',
                 None,
                 )
@@ -106,25 +106,25 @@ class TestUrlPatch(unittest.TestCase):
                 )
     
     def test_check_patched(self):
-        self.assertTrue(torrent_proxy_patch.check_patched(
+        self.assertTrue(torrent_proxy_patcher.check_patched(
                 'https://ssl-proxy-for-https.example.com/bt3.rutracker.org/ann?uk=XXXXXXXX',
                 'https://ssl-proxy-for-https.example.com',
                 ))
     
     def test_check_patched_2(self):
-        self.assertFalse(torrent_proxy_patch.check_patched(
+        self.assertFalse(torrent_proxy_patcher.check_patched(
                 'https://ssl-proxy-for-https.example.com.com/bt3.rutracker.org/ann?uk=XXXXXXXX',
                 'https://ssl-proxy-for-https.example.com',
                 ))
     
     def test_check_patched_3(self):
-        self.assertTrue(torrent_proxy_patch.check_patched(
+        self.assertTrue(torrent_proxy_patcher.check_patched(
                 'https://ssl-proxy-for-https.example.com/bt3.rutracker.org/ann?uk=XXXXXXXX',
                 'https://ssl-proxy-for-https.example.com/',
                 ))
     
     def test_check_patched_4(self):
-        self.assertFalse(torrent_proxy_patch.check_patched(
+        self.assertFalse(torrent_proxy_patcher.check_patched(
                 'https://ssl-proxy-for-https.example.com/bt3.rutracker.org/ann?uk=XXXXXXXX',
                 None,
                 ))

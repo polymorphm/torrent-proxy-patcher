@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- mode: python; coding: utf-8 -*-
 #
 # Copyright 2013 Andrej Antonov <polymorphm@gmail.com>.
 #
@@ -18,7 +17,10 @@
 
 assert str is not bytes
 
-from lib_torrent_proxy_patch_2013_09_16.main import main
+import unittest
+from lib_torrent_proxy_patcher_2013_09_16.test_bencode import TestBencode
+from lib_torrent_proxy_patcher_2013_09_16.test_bdecode import TestBdecode
+from lib_torrent_proxy_patcher_2013_09_16.test_url_patcher import TestUrlPatcher
 
 if __name__ == '__main__':
-    main()
+    unittest.main()

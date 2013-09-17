@@ -25,12 +25,12 @@ import threading
 import traceback
 from .bdecode import bdecode
 from .bencode import bencode
-from .torrent_proxy_patch import torrent_proxy_patch
+from .torrent_proxy_patcher import torrent_proxy_patcher
 
 DEFAULT_CONFIG_PATH = path.abspath(path.join(
         path.dirname(__file__),
         '..',
-        'torrent-proxy-patch.cfg',
+        'torrent-proxy-patcher.cfg',
         ))
 
 def main():
@@ -74,8 +74,8 @@ def main():
     with open(config_path, encoding='utf-8', errors='replace') as config_fd:
         config.read_file(config_fd, source=config_path)
     
-    proxy_for_http = config.get('torrent-proxy-patch', 'proxy-for-http', fallback=None)
-    proxy_for_https = config.get('torrent-proxy-patch', 'proxy-for-https', fallback=None)
+    proxy_for_http = config.get('torrent-proxy-patcher', 'proxy-for-http', fallback=None)
+    proxy_for_https = config.get('torrent-proxy-patcher', 'proxy-for-https', fallback=None)
     
     def task_thread_func():
         # perform task not in main thread
@@ -96,20 +96,20 @@ def main():
                 
                 if args.verbose:
                     print('file {!r}:'.format(torrent_path))
-                    def on_url_patch(url, new_url):
+                    def on_url_patched(url, new_url):
                         assert isinstance(url, str)
                         assert isinstance(new_url, str)
                         
                         print('changed: {!r} to {!r}'.format(url, new_url))
                 else:
-                    def on_url_patch(url, new_url):
+                    def on_url_patched(url, new_url):
                         pass
                 
-                torrent_proxy_patch(
+                torrent_proxy_patcher(
                         torrent_data,
                         proxy_for_http=proxy_for_http,
                         proxy_for_https=proxy_for_https,
-                        on_url_patch=on_url_patch,
+                        on_url_patched=on_url_patched,
                         )
                 
                 with open(torrent_path, mode='wb') as fd:

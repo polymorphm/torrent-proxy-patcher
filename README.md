@@ -1,7 +1,7 @@
-torrent-proxy-patch
-===================
+torrent-proxy-patcher
+=====================
 
-``torrent-proxy-patch`` is utility for batch changing tracker-URL in torrent-files to proxy-URL.
+``torrent-proxy-patcher`` is utility for batch changing tracker-URL in torrent-files to proxy-URL.
 
 status
 ------

@@ -42,7 +42,7 @@ def check_patched(url, proxy_url):
     
     return False
 
-def url_patch(url, proxy_url):
+def url_patcher(url, proxy_url):
     assert isinstance(url, str)
     
     if proxy_url is None:
@@ -61,11 +61,11 @@ def url_patch(url, proxy_url):
     
     return new_url
 
-def torrent_proxy_patch(
+def torrent_proxy_patcher(
         torrent_data,
         proxy_for_http=None,
         proxy_for_https=None,
-        on_url_patch=None,
+        on_url_patched=None,
         ):
     if not isinstance(torrent_data, dict):
         raise ValueError('invalid torrent data format')
@@ -79,16 +79,16 @@ def torrent_proxy_patch(
         if announce.startswith('http:'):
             if not check_patched(announce, proxy_for_http) and \
                     not check_patched(announce, proxy_for_https):
-                new_announce = url_patch(announce, proxy_for_http)
-                if on_url_patch is not None:
-                    on_url_patch(announce, new_announce)
+                new_announce = url_patcher(announce, proxy_for_http)
+                if on_url_patched is not None:
+                    on_url_patched(announce, new_announce)
                 announce = new_announce
         elif announce.startswith('https:'):
             if not check_patched(announce, proxy_for_http) and \
                     not check_patched(announce, proxy_for_https):
-                new_announce = url_patch(announce, proxy_for_https)
-                if on_url_patch is not None:
-                    on_url_patch(announce, new_announce)
+                new_announce = url_patcher(announce, proxy_for_https)
+                if on_url_patched is not None:
+                    on_url_patched(announce, new_announce)
                 announce = new_announce
         
         torrent_data[b'announce'] = announce.encode()
@@ -115,16 +115,16 @@ def torrent_proxy_patch(
                 if announce_item.startswith('http:'):
                     if not check_patched(announce_item, proxy_for_http) and \
                              not check_patched(announce_item, proxy_for_https):
-                        mew_announce_item = url_patch(announce_item, proxy_for_http)
-                        if on_url_patch is not None:
-                            on_url_patch(announce_item, new_announce_item)
+                        mew_announce_item = url_patcher(announce_item, proxy_for_http)
+                        if on_url_patched is not None:
+                            on_url_patched(announce_item, new_announce_item)
                         announce_item = new_announce_item
                 elif proxy_for_https is not None and announce_item.startswith('https:'):
                     if not check_patched(announce_item, proxy_for_http) and \
                              not check_patched(announce_item, proxy_for_https):
-                        new_announce_item = url_patch(announce_item, proxy_for_https)
-                        if on_url_patch is not None:
-                            on_url_patch(announce_item, new_announce_item)
+                        new_announce_item = url_patcher(announce_item, proxy_for_https)
+                        if on_url_patched is not None:
+                            on_url_patched(announce_item, new_announce_item)
                         announce_item = new_announce_item
                 
                 new_announce_list.append(announce_item.encode())
