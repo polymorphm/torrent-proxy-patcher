@@ -45,6 +45,12 @@ def main():
             )
     
     arg_parser.add_argument(
+            '--verbose',
+            action='store_true',
+            help='be more verbose. WARNING: it is dangerous, because URL may has secret key',
+            )
+    
+    arg_parser.add_argument(
             '--force',
             action='store_true',
             help='disable poka-yoke',
@@ -88,10 +94,22 @@ def main():
                 with open(torrent_path, mode='rb') as fd:
                     torrent_data = bdecode(fd.read())
                 
+                if args.verbose:
+                    print('file {!r}:'.format(torrent_path))
+                    def on_url_patch(url, new_url):
+                        assert isinstance(url, str)
+                        assert isinstance(new_url, str)
+                        
+                        print('changed: {!r} to {!r}'.format(url, new_url))
+                else:
+                    def on_url_patch(url, new_url):
+                        pass
+                
                 torrent_proxy_patch(
                         torrent_data,
                         proxy_for_http=proxy_for_http,
                         proxy_for_https=proxy_for_https,
+                        on_url_patch=on_url_patch,
                         )
                 
                 with open(torrent_path, mode='wb') as fd:
