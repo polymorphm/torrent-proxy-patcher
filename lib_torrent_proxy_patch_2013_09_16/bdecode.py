@@ -122,6 +122,7 @@ def bdecode_pos(b_val, curr_pos, _level=None):
     if b_val[curr_pos:curr_pos+1] == b'd':
         curr_pos += 1
         val = {}
+        
         while True:
             if b_val[curr_pos:curr_pos+1] == b'e':
                 curr_pos += 1
