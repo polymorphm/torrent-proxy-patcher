@@ -115,7 +115,7 @@ def write_announce_list_list(torrent_data, announce_list_list):
     
     if not announce_list_list:
         torrent_data[b'announce'] = b''
-        torrent_data[b'announce-list'] = (),
+        torrent_data[b'announce-list'] = ()
         return
     
     torrent_data[b'announce'] = announce_list_list[0][0]
