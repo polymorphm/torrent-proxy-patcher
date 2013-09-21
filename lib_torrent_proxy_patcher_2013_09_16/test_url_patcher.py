@@ -93,18 +93,6 @@ class TestUrlPatcher(unittest.TestCase):
                 patched,
                 )
     
-    def test_url_patcher_7(self):
-        patched = torrent_proxy_patcher.url_patcher(
-                'http://bt3.rutracker.org/ann?uk=XXXXXXXX',
-                None,
-                )
-        
-        self.assertIsInstance(patched, str)
-        self.assertEqual(
-                'http://bt3.rutracker.org/ann?uk=XXXXXXXX',
-                patched,
-                )
-    
     def test_check_patched(self):
         self.assertTrue(torrent_proxy_patcher.check_patched(
                 'https://ssl-proxy-for-https.example.com/bt3.rutracker.org/ann?uk=XXXXXXXX',

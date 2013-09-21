@@ -19,6 +19,8 @@ assert str is not bytes
 
 from urllib import parse as url_parse
 
+RETRACKER_LOCAL_URL = 'http://retracker.local/announce'
+
 def normalize_proxy_url(proxy_url):
     assert proxy_url is not None
     
@@ -44,9 +46,7 @@ def check_patched(url, proxy_url):
 
 def url_patcher(url, proxy_url):
     assert isinstance(url, str)
-    
-    if proxy_url is None:
-        return url
+    assert isinstance(proxy_url, str)
     
     proxy_url = normalize_proxy_url(proxy_url)
     orig_scheme, orig_netloc, orig_path, orig_query, orig_fragment = url_parse.urlsplit(url)
@@ -61,72 +61,143 @@ def url_patcher(url, proxy_url):
     
     return new_url
 
-def torrent_proxy_patcher(
-        torrent_data,
-        proxy_for_http=None,
-        proxy_for_https=None,
-        on_url_patched=None,
-        ):
-    if not isinstance(torrent_data, dict):
-        raise ValueError('invalid torrent data format')
+def read_announce_list_list(torrent_data):
+    # read as editable list
     
-    announce = torrent_data.get(b'announce')
+    assert torrent_data is not None
     
-    if isinstance(announce, (bytes, str)):
-        if isinstance(announce, bytes):
-            announce = announce.decode(errors='replace')
+    announce_list_list = []
+    
+    single_announce = torrent_data.get(b'announce')
+    
+    if isinstance(single_announce, (bytes, str)):
+        if isinstance(single_announce, bytes):
+            single_announce = single_announce.decode(errors='replace')
         
-        if announce.startswith('http:'):
-            if not check_patched(announce, proxy_for_http) and \
-                    not check_patched(announce, proxy_for_https):
-                new_announce = url_patcher(announce, proxy_for_http)
-                if on_url_patched is not None:
-                    on_url_patched(announce, new_announce)
-                announce = new_announce
-        elif announce.startswith('https:'):
-            if not check_patched(announce, proxy_for_http) and \
-                    not check_patched(announce, proxy_for_https):
-                new_announce = url_patcher(announce, proxy_for_https)
-                if on_url_patched is not None:
-                    on_url_patched(announce, new_announce)
-                announce = new_announce
-        
-        torrent_data[b'announce'] = announce.encode()
+        if single_announce:
+            announce_list_list = [[single_announce]]
     
-    announce_list_list = torrent_data.get(b'announce-list')
-    if isinstance(announce_list_list, (tuple, list)):
+    raw_announce_list_list = torrent_data.get(b'announce-list')
+    
+    if isinstance(raw_announce_list_list, (tuple, list)):
         new_announce_list_list = []
         
-        for announce_list in announce_list_list:
-            if not isinstance(announce_list, (tuple, list)):
-                new_announce_list_list.append(announce_list)
+        for raw_announce_list in raw_announce_list_list:
+            if not isinstance(raw_announce_list, (tuple, list)):
                 continue
             
-            new_announce_list = []
+            announce_list = []
             
-            for announce_item in announce_list:
+            for announce_item in raw_announce_list:
                 if not isinstance(announce_item, (bytes, str)):
-                    new_announce_list.append(announce_item)
                     continue
                 
                 if isinstance(announce_item, bytes):
                     announce_item = announce_item.decode(errors='replace')
                 
-                if announce_item.startswith('http:'):
-                    if not check_patched(announce_item, proxy_for_http) and \
-                             not check_patched(announce_item, proxy_for_https):
-                        new_announce_item = url_patcher(announce_item, proxy_for_http)
-                        if on_url_patched is not None:
-                            on_url_patched(announce_item, new_announce_item)
-                        announce_item = new_announce_item
-                elif proxy_for_https is not None and announce_item.startswith('https:'):
-                    if not check_patched(announce_item, proxy_for_http) and \
-                             not check_patched(announce_item, proxy_for_https):
-                        new_announce_item = url_patcher(announce_item, proxy_for_https)
-                        if on_url_patched is not None:
-                            on_url_patched(announce_item, new_announce_item)
-                        announce_item = new_announce_item
+                if announce_item:
+                    announce_list.append(announce_item)
+            
+            if announce_list:
+                new_announce_list_list.append(announce_list)
+        
+        if new_announce_list_list:
+            # if ``new_announce_list_list`` exist
+            #       than ``single_announce`` is not needed
+            
+            announce_list_list = new_announce_list_list
+    
+    return announce_list_list
+
+def write_announce_list_list(torrent_data, announce_list_list):
+    assert torrent_data is not None
+    assert announce_list_list is not None
+    
+    if not announce_list_list:
+        print('**** THIS !!! ****')
+        torrent_data[b'announce'] = b''
+        torrent_data[b'announce-list'] = (),
+        return
+    
+    torrent_data[b'announce'] = announce_list_list[0][0]
+    torrent_data[b'announce-list'] = \
+            tuple(tuple(announce_list) for announce_list in announce_list_list)
+
+def torrent_proxy_patcher(
+        torrent_data,
+        proxy_for_http=None,
+        proxy_for_https=None,
+        on_url_patched=None,
+        replace_mode=None,
+        ):
+    if not isinstance(torrent_data, dict):
+        raise ValueError('invalid torrent data format')
+    
+    if replace_mode is None:
+        replace_mode = False
+    
+    def check_patched_all(announce):
+        if check_patched(announce, proxy_for_http) or \
+                check_patched(announce, proxy_for_https):
+            return True
+        
+        return False
+    
+    announce_list_list = read_announce_list_list(torrent_data)
+    patched_announce_list_total = [] # this var -- need only for: detect copies of patched url
+    patched_announce_list_list = []
+    
+    for announce_list in announce_list_list:
+        patched_announce_list = []
+        
+        for announce in announce_list:
+            if check_patched_all(announce):
+                if replace_mode and announce:
+                    # in replace mode -- we need save old patched urls
+                    
+                    patched_announce_list.append(announce)
                 
-                new_announce_list.append(announce_item.encode())
-            new_announce_list_list.append(tuple(new_announce_list))
-        torrent_data[b'announce-list'] = tuple(new_announce_list_list)
+                patched_announce_list_total.append(announce)
+                
+                continue
+            
+            if RETRACKER_LOCAL_URL == announce:
+                continue
+            
+            if announce.startswith('http:'):
+                if proxy_for_http is None:
+                    continue
+                
+                new_announce = url_patcher(announce, proxy_for_http)
+            elif announce.startswith('https:'):
+                if proxy_for_https is None:
+                    continue
+                
+                new_announce = url_patcher(announce, proxy_for_https)
+            else:
+                continue
+            
+            if new_announce in patched_announce_list_total:
+                # copies of patched url -- avoid
+                continue
+            
+            if on_url_patched is not None:
+                on_url_patched(announce, new_announce)
+            
+            if new_announce:
+                patched_announce_list.append(new_announce)
+                patched_announce_list_total.append(new_announce)
+        
+        if patched_announce_list:
+            patched_announce_list_list.append(patched_announce_list)
+    
+    if replace_mode:
+        # replace mode
+        
+        announce_list_list = patched_announce_list_list
+    else:
+        # add mode
+        
+        announce_list_list = patched_announce_list_list + announce_list_list
+    
+    write_announce_list_list(torrent_data, announce_list_list)

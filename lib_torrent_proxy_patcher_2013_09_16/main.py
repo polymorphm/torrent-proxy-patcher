@@ -78,9 +78,6 @@ def main():
     proxy_for_https = config.get('torrent-proxy-patcher', 'proxy-for-https', fallback=None)
     replace_mode = config.getboolean('torrent-proxy-patcher', 'replace-mode', fallback=None)
     
-    if replace_mode is None:
-        replace_mode = False
-    
     def task_thread_func():
         # perform task not in main thread
         
@@ -114,7 +111,7 @@ def main():
                         proxy_for_http=proxy_for_http,
                         proxy_for_https=proxy_for_https,
                         on_url_patched=on_url_patched,
-                        #replace_mode=replace_mode,
+                        replace_mode=replace_mode,
                         )
                 
                 with open(torrent_path, mode='wb') as fd:
