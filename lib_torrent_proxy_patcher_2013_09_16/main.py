@@ -96,12 +96,12 @@ def main():
                     torrent_data = bdecode(fd.read())
                 
                 if args.verbose:
-                    print('file {!r}:'.format(torrent_path))
+                    print('file {!r}...'.format(torrent_path))
                     def on_url_patched(url, new_url):
                         assert isinstance(url, str)
                         assert isinstance(new_url, str)
                         
-                        print('announce url: {!r} to {!r}'.format(url, new_url))
+                        print('announce url: {!r} => {!r}'.format(url, new_url))
                 else:
                     def on_url_patched(url, new_url):
                         pass
