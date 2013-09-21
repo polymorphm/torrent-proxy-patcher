@@ -114,7 +114,6 @@ def write_announce_list_list(torrent_data, announce_list_list):
     assert announce_list_list is not None
     
     if not announce_list_list:
-        print('**** THIS !!! ****')
         torrent_data[b'announce'] = b''
         torrent_data[b'announce-list'] = (),
         return
