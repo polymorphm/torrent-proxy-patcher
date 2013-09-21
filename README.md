@@ -6,4 +6,4 @@ torrent-proxy-patcher
 status
 ------
 
-Developer version.
+Beta version (0.2).
