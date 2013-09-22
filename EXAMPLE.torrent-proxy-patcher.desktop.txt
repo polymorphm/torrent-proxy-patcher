@@ -1,0 +1,11 @@
+# -*- mode: desktop; coding: utf-8 -*-
+# 
+# copy (and edit) this file to:
+#       /usr/share/applications/torrent-proxy-patcher.desktop
+#   or
+#       /home/<username>/.local/share/applications/torrent-proxy-patcher.desktop
+
+[Desktop Entry]
+Name=Torrent Proxy Patcher
+#Exec=/<path>/torrent-proxy-patcher/torrent-proxy-patcher %F
+Type=Application
