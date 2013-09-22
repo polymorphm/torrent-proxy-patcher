@@ -83,14 +83,13 @@ def main():
         
         for torrent_path in args.torrent_file:
             try:
-                if not args.force:
-                    if not torrent_path.endswith('.torrent'):
-                        print(
-                                'error: file {!r} may be is not a torrent file'.format(torrent_path),
-                                file=sys.stderr,
-                                )
-                        
-                        continue
+                if not torrent_path.endswith('.torrent') and not args.force:
+                    print(
+                            'error: file {!r} may be is not a torrent file'.format(torrent_path),
+                            file=sys.stderr,
+                            )
+                    
+                    continue
                 
                 with open(torrent_path, mode='rb') as fd:
                     torrent_data = bdecode(fd.read())
