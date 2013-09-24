@@ -27,20 +27,24 @@ except ImportError:
     fcntl = None
 
 def flock(fd):
-    if fcntl is not None:
-        fcntl.flock(fd, fcntl.LOCK_EX)
+    if fcntl is None:
+        # XXX on Microsoft Windows case -- we ignore lock.
+        #       this ignore -- may be lead to error,
+        #       and we need alternative implementation
+        
+        return
     
-    # XXX on Microsoft Windows case -- we ignore lock.
-    #       this ignore -- may be lead to error,
-    #       and we need alternative implementation
+    fcntl.flock(fd, fcntl.LOCK_EX)
 
 def unflock(fd):
-    if fcntl is not None:
-        fcntl.flock(fd, fcntl.LOCK_UN)
+    if fcntl is None:
+        # XXX on Microsoft Windows case -- we ignore lock.
+        #       this ignore -- may be lead to error,
+        #       and we need alternative implementation
+        
+        return
     
-    # XXX on Microsoft Windows case -- we ignore lock.
-    #       this ignore -- may be lead to error,
-    #       and we need alternative implementation
+    fcntl.flock(fd, fcntl.LOCK_UN)
 
 @contextlib.contextmanager
 def flock_context(path):
