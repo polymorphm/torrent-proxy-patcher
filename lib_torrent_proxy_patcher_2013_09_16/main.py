@@ -23,6 +23,7 @@ import argparse
 import configparser
 import threading
 import traceback
+from .flock import flock_context
 from .bdecode import bdecode
 from .bencode import bencode
 from .torrent_proxy_patcher import torrent_proxy_patcher
@@ -91,30 +92,31 @@ def main():
                     
                     continue
                 
-                with open(torrent_path, mode='rb') as fd:
-                    torrent_data = bdecode(fd.read())
-                
-                if args.verbose:
-                    print('file {!r}...'.format(torrent_path))
-                    def on_url_patched(url, new_url):
-                        assert isinstance(url, str)
-                        assert isinstance(new_url, str)
-                        
-                        print('announce url: {!r} => {!r}'.format(url, new_url))
-                else:
-                    def on_url_patched(url, new_url):
-                        pass
-                
-                torrent_proxy_patcher(
-                        torrent_data,
-                        proxy_for_http=proxy_for_http,
-                        proxy_for_https=proxy_for_https,
-                        on_url_patched=on_url_patched,
-                        replace_mode=replace_mode,
-                        )
-                
-                with open(torrent_path, mode='wb') as fd:
-                    fd.write(bencode(torrent_data))
+                with flock_context(torrent_path):
+                    with open(torrent_path, mode='rb') as fd:
+                        torrent_data = bdecode(fd.read())
+                    
+                    if args.verbose:
+                        print('file {!r}...'.format(torrent_path))
+                        def on_url_patched(url, new_url):
+                            assert isinstance(url, str)
+                            assert isinstance(new_url, str)
+                            
+                            print('announce url: {!r} => {!r}'.format(url, new_url))
+                    else:
+                        def on_url_patched(url, new_url):
+                            pass
+                    
+                    torrent_proxy_patcher(
+                            torrent_data,
+                            proxy_for_http=proxy_for_http,
+                            proxy_for_https=proxy_for_https,
+                            on_url_patched=on_url_patched,
+                            replace_mode=replace_mode,
+                            )
+                    
+                    with open(torrent_path, mode='wb') as fd:
+                        fd.write(bencode(torrent_data))
             except:
                 print(
                         'error: file {!r}:\n'.format(torrent_path) +
