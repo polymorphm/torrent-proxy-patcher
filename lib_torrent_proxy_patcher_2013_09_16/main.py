@@ -23,7 +23,7 @@
 assert str is not bytes
 
 import sys
-from os import path
+import os, os.path
 import argparse
 import configparser
 import threading
@@ -33,8 +33,8 @@ from .bdecode import bdecode
 from .bencode import bencode
 from .torrent_proxy_patcher import torrent_proxy_patcher
 
-DEFAULT_CONFIG_PATH = path.abspath(path.join(
-        path.dirname(__file__),
+DEFAULT_CONFIG_PATH = os.path.abspath(os.path.join(
+        os.path.dirname(__file__),
         '..',
         'torrent-proxy-patcher.cfg',
         ))
