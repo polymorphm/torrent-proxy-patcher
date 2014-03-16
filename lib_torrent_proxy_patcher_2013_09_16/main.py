@@ -120,8 +120,10 @@ def main():
                             replace_mode=replace_mode,
                             )
                     
-                    with open(torrent_path, mode='wb') as fd:
+                    torrent_new_path = '{}.new-{}'.format(torrent_path, os.getpid())
+                    with open(torrent_new_path, mode='wb') as fd:
                         fd.write(bencode(torrent_data))
+                    os.replace(torrent_new_path, torrent_path)
             except:
                 print(
                         'error: file {!r}:\n'.format(torrent_path) +
